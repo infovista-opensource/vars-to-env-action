@@ -119,7 +119,8 @@ describe('secrets-to-env-action', () => {
     mockInputs({
       secrets: JSON.stringify(inputSecrets),
       prefix: 'PREF_',
-      include: 'MY_SECRET_1, MY_SECRET_2'
+      include: 'MY_SECRET_1, MY_SECRET_2',
+      tracelog: 'true'
     })
     main()
 
@@ -133,7 +134,8 @@ describe('secrets-to-env-action', () => {
     mockInputs({
       secrets: JSON.stringify(inputSecrets),
       removeprefix: 'MY_',
-      include: 'MY_SECRET_1, MY_SECRET_2'
+      include: 'MY_SECRET_1,MY_SECRET_2',
+      tracelog: 'true'
     })
     main()
 
@@ -168,7 +170,7 @@ describe('secrets-to-env-action', () => {
     })
     main()
 
-    expect(newSecrets).toEqual(inputSecrets)
+    expect(newSecrets).toEqual(outputSecrets)
   })
 
   it('does not override variables', () => {

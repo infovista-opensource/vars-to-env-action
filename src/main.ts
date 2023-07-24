@@ -15,10 +15,7 @@ export default async function run(): Promise<void> {
     const convert = convertStr.length ? convertStr : 'upper'
     const overrideStr: string = core.getInput('override')
     const override = overrideStr.length ? overrideStr === 'true' : false
-    const removePrefixStr: string = core.getInput('removeprefix')
-    const removePrefix = removePrefixStr.length
-      ? removePrefixStr === 'true'
-      : true
+    const removePrefix: string = core.getInput('removeprefix')
     const traceLogStr: string = core.getInput('tracelog')
     const traceLog = traceLogStr.length ? traceLogStr === 'true' : false
 
@@ -62,10 +59,11 @@ or:
       }
 
       let newKey = key
-      if (removePrefix) {
-        if (traceLog) core.info(`removing prefix from ${key}`)
-        newKey = newKey.replace(keyPrefix, '')
+      if (removePrefix.length) {
+        if (traceLog) core.debug(`removing prefix from ${key}`)
+        newKey = newKey.replace(removePrefix, '')
       } else if (keyPrefix.length) {
+        if (traceLog) core.debug(`adding prefix to ${key}`)
         newKey = `${keyPrefix}${newKey}`
       }
 
