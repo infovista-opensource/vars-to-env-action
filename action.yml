@@ -1,10 +1,10 @@
-name: 'Export all secrets to env variables'
-description: 'Utility action that exports all github secrets to environment variables'
-author: 'Jose Pereira @oNaiPs'
+name: 'Export all vars/secrets to env variables'
+description: 'Utility action that exports all github vars/secrets to environment variables'
+author: 'Daniele Franceschi @danielefranceschi'
 inputs:
   secrets:
     required: true
-    description: JSON representation of the secrets, use provided placeholder'
+    description: JSON representation of the vars/secrets, use provided placeholder'
   prefix:
     required: false
     description: 'Prefix to add to all secrets, e.g.: SECRET_'
@@ -16,10 +16,16 @@ inputs:
     description: 'Comma-separated list of secrets to skip exporting'
   convert:
     required: false
-    description: 'Converts secrets name to a specific string format'
-  convert_prefix:
+    description: 'Converts secrets name to a specific string case (default: upper)'
+  override:
     required: false
-    description: 'Include prefix (or not) on conversion. True by default'
+    description: 'Override existing environment variables (false by default)'
+  removeprefix:
+    required: false
+    description: 'Remove prefix from secrets name, if present'
+  tracelog:
+    required: false
+    description: 'extensive debug logging (false by default)'
 runs:
   using: 'node16'
   main: 'dist/index.js'
