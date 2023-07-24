@@ -15,6 +15,7 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
           exclude: non-existent,SECRET_2
+          tracelog: true
         env:
           SECRET_1: 1234 # Should show override warning
       - name: Verify secrets to env variables (with exclude)
@@ -33,6 +34,7 @@ jobs:
         uses: ./
         with:
           prefix: PREF_
+          tracelog: true
           secrets: ${{ toJSON(secrets) }}
           include: non-existent, SECRET_1
       - name: Verify secrets to env variables (with prefix, include)
@@ -46,6 +48,26 @@ jobs:
           true
         shell: bash
 
+  test-remove-prefix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Export variables to env variables with prefix removal
+        uses: ./
+        with:
+          removeprefix: PFX_
+          tracelog: true
+          include: PFX_.+
+          secrets: ${{ toJSON(vars) }}
+      - name: Verify secrets to env variables (with prefix removal)
+        run: |
+          [[ "${PFX_VAR1}" != "" ]] && echo "SECRET_1 should be unset, got ${SECRET_1}" && exit 1
+          [[ "${PFX_VAR2}" != "" ]] && echo "SECRET_2 should be unset, got ${SECRET_2}" && exit 1
+          [[ "${VAR1}" != "var1" ]] && echo "Could not export VAR1 secret, value is ${PFX_VAR1}" && exit 1
+          [[ "${VAR2}" != "var2" ]] && echo "Could not export VAR2 variable, value is ${PFX_VAR2}" && exit 1
+          true
+        shell: bash
+
   test-override:
     runs-on: ubuntu-latest
     env:
@@ -55,7 +77,8 @@ jobs:
       - name: Export secrets to env variables (override)
         uses: ./
         with:
-          override: false
+          override: true
+          tracelog: true
           secrets: ${{ toJSON(secrets) }}
       - name: Verify secrets to env variables (override)
         run: |
@@ -70,32 +93,13 @@ jobs:
       - name: Export secrets to env variables (convert)
         uses: ./
         with:
-          convert: pascal
+          convert: lower
           secrets: ${{ toJSON(secrets) }}
       - name: Verify secrets to env variables (convert)
         run: |
-          [[ "${Secret_1}" != "VALUE_1" ]] && echo "Could not export Secret_1 secret, value is ${Secret_1}" && exit 1
-          [[ "${Secret_2}" != "VALUE_2" ]] && echo "Could not export Secret_2 secret, value is ${Secret_2}" && exit 1
-          [[ "${Secret_3}" != "VALUE_3" ]] && echo "Could not export Secret_3 secret, value is ${Secret_3}" && exit 1
-          true
-        shell: bash
-
-  test-convert-prefix:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Export secrets to env variables (starts with, include)
-        uses: ./
-        with:
-          prefix: MY_
-          convert_prefix: false
-          convert: lower
-          secrets: ${{ toJSON(secrets) }}
-      - name: Verify secrets to env variables (starts with, include)
-        run: |
-          [[ "${MY_secret_1}" != "VALUE_1" ]] && echo "Could not export MY_secret_1 secret, value is ${MY_secret_1}" && exit 1
-          [[ "${MY_secret_2}" != "VALUE_2" ]] && echo "Could not export MY_secret_2 secret, value is ${MY_secret_2}" && exit 1
-          [[ "${MY_secret_3}" != "VALUE_3" ]] && echo "Could not export MY_secret_3 secret, value is ${MY_secret_3}" && exit 1
+          [[ "${secret_1}" != "VALUE_1" ]] && echo "Could not export secret_1 secret, value is ${secret_1}" && exit 1
+          [[ "${secret_2}" != "VALUE_2" ]] && echo "Could not export secret_2 secret, value is ${secret_2}" && exit 1
+          [[ "${secret_3}" != "VALUE_3" ]] && echo "Could not export secret_3 secret, value is ${secret_3}" && exit 1
           true
         shell: bash
 

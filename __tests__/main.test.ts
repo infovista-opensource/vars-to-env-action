@@ -1,5 +1,3 @@
-import * as cp from 'child_process'
-import * as path from 'path'
 import {expect, jest, test} from '@jest/globals'
 import * as core from '@actions/core'
 import main from '../src/main'
@@ -101,7 +99,7 @@ describe('secrets-to-env-action', () => {
   it('includes variables (regex)', () => {
     mockInputs({
       secrets: JSON.stringify(inputSecrets),
-      include: 'MY_SECRET_*'
+      include: 'MY_SECRET_.+'
     })
     main()
 
@@ -125,6 +123,20 @@ describe('secrets-to-env-action', () => {
     })
   })
 
+  it('removes a prefix', () => {
+    mockInputs({
+      secrets: JSON.stringify(inputSecrets),
+      removeprefix: 'MY_',
+      include: 'MY_SECRET_1, MY_SECRET_2'
+    })
+    main()
+
+    expect(newSecrets).toEqual({
+      SECRET_1: inputSecrets.MY_SECRET_1,
+      SECRET_2: inputSecrets.MY_SECRET_2
+    })
+  })
+
   it('converts key (lower)', () => {
     mockInputs({
       secrets: JSON.stringify(inputSecrets),
@@ -136,80 +148,6 @@ describe('secrets-to-env-action', () => {
     expect(newSecrets).toEqual({
       my_secret_1: inputSecrets.MY_SECRET_1,
       my_secret_2: inputSecrets.MY_SECRET_2
-    })
-  })
-
-  it('converts key (camel)', () => {
-    mockInputs({
-      secrets: JSON.stringify(inputSecrets),
-      include: 'MY_SECRET_1, MY_SECRET_2',
-      convert: 'camel'
-    })
-    main()
-
-    expect(newSecrets).toEqual({
-      mySecret_1: inputSecrets.MY_SECRET_1,
-      mySecret_2: inputSecrets.MY_SECRET_2
-    })
-  })
-
-  it('converts key (pascal)', () => {
-    mockInputs({
-      secrets: JSON.stringify(inputSecrets),
-      include: 'MY_SECRET_1, MY_SECRET_2',
-      convert: 'pascal'
-    })
-    main()
-
-    expect(newSecrets).toEqual({
-      MySecret_1: inputSecrets.MY_SECRET_1,
-      MySecret_2: inputSecrets.MY_SECRET_2
-    })
-  })
-
-  it('converts key (snake)', () => {
-    mockInputs({
-      secrets: JSON.stringify(inputSecrets),
-      include: 'MY_SECRET_1, MY_SECRET_2',
-      convert: 'snake'
-    })
-    main()
-
-    expect(newSecrets).toEqual({
-      my_secret_1: inputSecrets.MY_SECRET_1,
-      my_secret_2: inputSecrets.MY_SECRET_2
-    })
-  })
-
-  it('converts prefix', () => {
-    mockInputs({
-      secrets: JSON.stringify(inputSecrets),
-      include: 'MY_SECRET_1, MY_SECRET_2',
-      prefix: 'PREFIX_',
-      convert: 'snake',
-      convert_prefix: 'true'
-    })
-    main()
-
-    expect(newSecrets).toEqual({
-      prefix_my_secret_1: inputSecrets.MY_SECRET_1,
-      prefix_my_secret_2: inputSecrets.MY_SECRET_2
-    })
-  })
-
-  it('does not convert prefix', () => {
-    mockInputs({
-      secrets: JSON.stringify(inputSecrets),
-      include: 'MY_SECRET_1, MY_SECRET_2',
-      prefix: 'PREFIX_',
-      convert: 'snake',
-      convert_prefix: 'false'
-    })
-    main()
-
-    expect(newSecrets).toEqual({
-      PREFIX_my_secret_1: inputSecrets.MY_SECRET_1,
-      PREFIX_my_secret_2: inputSecrets.MY_SECRET_2
     })
   })
 

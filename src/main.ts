@@ -1,17 +1,8 @@
 import * as core from '@actions/core'
 
-import {camelCase} from 'camel-case'
-import {constantCase} from 'constant-case'
-import {pascalCase} from 'pascal-case'
-import {snakeCase} from 'snake-case'
-
 const convertTypes: Record<string, (s: string) => string> = {
   lower: s => s.toLowerCase(),
-  upper: s => s.toUpperCase(),
-  camel: camelCase,
-  constant: constantCase,
-  pascal: pascalCase,
-  snake: snakeCase
+  upper: s => s.toUpperCase()
 }
 
 export default async function run(): Promise<void> {
@@ -27,13 +18,16 @@ export default async function run(): Promise<void> {
     const keyPrefix: string = core.getInput('prefix')
     const includeListStr: string = core.getInput('include')
     const excludeListStr: string = core.getInput('exclude')
-    const convert: string = core.getInput('convert')
-    const convertPrefixStr = core.getInput('convert_prefix')
-    const convertPrefix = convertPrefixStr.length
-      ? convertPrefixStr === 'true'
-      : true
+    const convertStr: string = core.getInput('convert')
+    const convert = convertStr.length ? convertStr : 'upper'
     const overrideStr: string = core.getInput('override')
-    const override = overrideStr.length ? overrideStr === 'true' : true
+    const override = overrideStr.length ? overrideStr === 'true' : false
+    const removePrefixStr: string = core.getInput('removeprefix')
+    const removePrefix = removePrefixStr.length
+        ? removePrefixStr === 'true'
+        : true
+    const traceLogStr: string = core.getInput('tracelog')
+    const traceLog = traceLogStr.length ? traceLogStr === 'true' : false
 
     let secrets: Record<string, string>
     try {
@@ -44,6 +38,8 @@ Make sure you add the following to this action:
 
 with:
       secrets: \${{ toJSON(secrets) }}
+or:
+      secrets: \${{ toJSON(vars) }}
 `)
     }
 
@@ -63,14 +59,22 @@ with:
 
     for (const key of Object.keys(secrets)) {
       if (includeList && !includeList.some(inc => key.match(new RegExp(inc)))) {
+        if (traceLog) core.info(`excluding ${key} as not in includelist`)
         continue
       }
 
       if (excludeList.some(inc => key.match(new RegExp(inc)))) {
+        if (traceLog) core.debug(`excluding ${key} as in includelist`)
         continue
       }
 
-      let newKey = keyPrefix.length ? `${keyPrefix}${key}` : key
+      let newKey = key
+      if (removePrefix) {
+        if (traceLog) core.info(`removing prefix from ${key}`)
+        newKey = newKey.replace(keyPrefix, '')
+      } else if (keyPrefix.length) {
+        newKey = `${keyPrefix}${newKey}`
+      }
 
       if (convert.length) {
         if (!convertTypes[convert]) {
@@ -80,16 +84,9 @@ with:
             ).join(', ')}`
           )
         }
-
-        if (!convertPrefix) {
-          newKey = `${keyPrefix}${convertTypes[convert](
-            newKey.replace(keyPrefix, '')
-          )}`
-        } else {
-          newKey = convertTypes[convert](newKey)
-        }
+        newKey = convertTypes[convert](newKey)
       }
-
+1
       if (process.env[newKey]) {
         if (override) {
           core.warning(`Will re-write "${newKey}" environment variable.`)
