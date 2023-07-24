@@ -1,10 +1,5 @@
 import * as core from '@actions/core'
 
-const convertTypes: Record<string, (s: string) => string> = {
-  lower: s => s.toLowerCase(),
-  upper: s => s.toUpperCase()
-}
-
 export default async function run(): Promise<void> {
   let excludeList = [
     // this variable is already exported automatically
@@ -24,8 +19,8 @@ export default async function run(): Promise<void> {
     const override = overrideStr.length ? overrideStr === 'true' : false
     const removePrefixStr: string = core.getInput('removeprefix')
     const removePrefix = removePrefixStr.length
-        ? removePrefixStr === 'true'
-        : true
+      ? removePrefixStr === 'true'
+      : true
     const traceLogStr: string = core.getInput('tracelog')
     const traceLog = traceLogStr.length ? traceLogStr === 'true' : false
 
@@ -77,16 +72,20 @@ or:
       }
 
       if (convert.length) {
-        if (!convertTypes[convert]) {
-          throw new Error(
-            `Unknown convert value "${convert}". Available: ${Object.keys(
-              convertTypes
-            ).join(', ')}`
-          )
+        switch (convert) {
+            case 'lower': {
+                newKey = newKey.toLowerCase()
+                break
+            }
+            case 'upper': {
+                newKey = newKey.toUpperCase()
+                break
+            }
+            default: {
+                throw new Error(`Unknown convert value "${convert}". Available: lower, upper`)
+            }
         }
-        newKey = convertTypes[convert](newKey)
       }
-1
       if (process.env[newKey]) {
         if (override) {
           core.warning(`Will re-write "${newKey}" environment variable.`)
