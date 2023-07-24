@@ -16,6 +16,7 @@ function mockInputs(inputs: {[key: string]: string}) {
 
 describe('secrets-to-env-action', () => {
   let inputSecrets: {[key: string]: string}
+  let outputSecrets: {[key: string]: string}
   let newSecrets: {[key: string]: string}
 
   beforeEach(() => {
@@ -23,6 +24,11 @@ describe('secrets-to-env-action', () => {
       MY_SECRET_1: 'VALUE_1',
       MY_SECRET_2: 'VALUE_2',
       my_low_secret_1: 'low_value_1'
+    }
+    outputSecrets = {
+        MY_SECRET_1: 'VALUE_1',
+        MY_SECRET_2: 'VALUE_2',
+        MY_LOW_SECRET_1: 'low_value_1'
     }
 
     newSecrets = {}
@@ -36,7 +42,7 @@ describe('secrets-to-env-action', () => {
       secrets: JSON.stringify(inputSecrets)
     })
     main()
-    expect(newSecrets).toEqual(inputSecrets)
+    expect(newSecrets).toEqual(outputSecrets)
   })
 
   it('excludes variables (single)', () => {
@@ -45,8 +51,8 @@ describe('secrets-to-env-action', () => {
       exclude: 'MY_SECRET_1'
     })
     main()
-    delete inputSecrets.MY_SECRET_1
-    expect(newSecrets).toEqual(inputSecrets)
+    delete outputSecrets.MY_SECRET_1
+    expect(newSecrets).toEqual(outputSecrets)
   })
 
   it('excludes variables (array)', () => {
@@ -55,9 +61,9 @@ describe('secrets-to-env-action', () => {
       exclude: 'MY_SECRET_1,MY_SECRET_2,ignore'
     })
     main()
-    delete inputSecrets.MY_SECRET_1
-    delete inputSecrets.MY_SECRET_2
-    expect(newSecrets).toEqual(inputSecrets)
+    delete outputSecrets.MY_SECRET_1
+    delete outputSecrets.MY_SECRET_2
+    expect(newSecrets).toEqual(outputSecrets)
   })
 
   it('excludes variables (regex)', () => {
@@ -66,9 +72,9 @@ describe('secrets-to-env-action', () => {
       exclude: 'MY_SECRET_*,ignore'
     })
     main()
-    delete inputSecrets.MY_SECRET_1
-    delete inputSecrets.MY_SECRET_2
-    expect(newSecrets).toEqual(inputSecrets)
+    delete outputSecrets.MY_SECRET_1
+    delete outputSecrets.MY_SECRET_2
+    expect(newSecrets).toEqual(outputSecrets)
   })
 
   it('includes variables (single)', () => {
