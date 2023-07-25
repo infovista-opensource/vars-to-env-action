@@ -47,9 +47,7 @@ function run() {
             'github_token'
         ];
         try {
-            const secretsJson = core.getInput('secrets', {
-                required: true
-            });
+            const secretsJson = core.getInput('secrets', { required: true });
             const keyPrefix = core.getInput('prefix');
             const includeListStr = core.getInput('include');
             const excludeListStr = core.getInput('exclude');
@@ -57,10 +55,7 @@ function run() {
             const convert = convertStr.length ? convertStr : 'upper';
             const overrideStr = core.getInput('override');
             const override = overrideStr.length ? overrideStr === 'true' : false;
-            const removePrefixStr = core.getInput('removeprefix');
-            const removePrefix = removePrefixStr.length
-                ? removePrefixStr === 'true'
-                : true;
+            const removePrefix = core.getInput('removeprefix');
             const traceLogStr = core.getInput('tracelog');
             const traceLog = traceLogStr.length ? traceLogStr === 'true' : false;
             let secrets;
@@ -84,8 +79,15 @@ or:
             if (excludeListStr.length) {
                 excludeList = excludeList.concat(excludeListStr.split(',').map(key => key.trim()));
             }
-            core.debug(`Using include list: ${includeList === null || includeList === void 0 ? void 0 : includeList.join(', ')}`);
-            core.debug(`Using exclude list: ${excludeList.join(', ')}`);
+            if (traceLog) {
+                core.debug(`Using include list: ${includeList === null || includeList === void 0 ? void 0 : includeList.join(', ')}`);
+                core.debug(`Using exclude list: ${excludeList.join(', ')}`);
+                core.debug(`Adding prefix: ${keyPrefix}`);
+                core.debug(`Removing prefix: ${removePrefix}`);
+                core.debug(`Override: ${override}`);
+                core.debug(`Convert: ${convert}`);
+                core.debug(`Override: ${override}`);
+            }
             for (const key of Object.keys(secrets)) {
                 if (includeList && !includeList.some(inc => key.match(new RegExp(inc)))) {
                     if (traceLog)
@@ -94,31 +96,30 @@ or:
                 }
                 if (excludeList.some(inc => key.match(new RegExp(inc)))) {
                     if (traceLog)
-                        core.debug(`excluding ${key} as in includelist`);
+                        core.debug(`excluding ${key} as in excludelist`);
                     continue;
                 }
                 let newKey = key;
-                if (removePrefix) {
+                if (removePrefix.length) {
                     if (traceLog)
-                        core.info(`removing prefix from ${key}`);
-                    newKey = newKey.replace(keyPrefix, '');
+                        core.debug(`removing prefix from ${key}`);
+                    newKey = key.replace(removePrefix, '');
+                    if (traceLog)
+                        core.debug(`prefix removal ${key} -> ${newKey}`);
                 }
                 else if (keyPrefix.length) {
-                    newKey = `${keyPrefix}${newKey}`;
+                    if (traceLog)
+                        core.debug(`adding prefix to ${key}`);
+                    newKey = `${keyPrefix}${key}`;
+                    if (traceLog)
+                        core.debug(`prefix add ${key} -> ${newKey}`);
                 }
                 if (convert.length) {
-                    switch (convert) {
-                        case 'lower': {
-                            newKey = newKey.toLowerCase();
-                            break;
-                        }
-                        case 'upper': {
-                            newKey = newKey.toUpperCase();
-                            break;
-                        }
-                        default: {
-                            throw new Error(`Unknown convert value "${convert}". Available: lower, upper`);
-                        }
+                    if (convert === 'lower') {
+                        newKey = newKey.toLowerCase();
+                    }
+                    else {
+                        newKey = newKey.toUpperCase();
                     }
                 }
                 if (process.env[newKey]) {
@@ -131,7 +132,7 @@ or:
                     }
                 }
                 core.exportVariable(newKey, secrets[key]);
-                core.info(`Exported secret ${newKey}`);
+                core.info(`Exported envvar -> ${newKey}`);
             }
         }
         catch (error) {
