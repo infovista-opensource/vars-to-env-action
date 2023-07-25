@@ -46,6 +46,11 @@ or:
 
     core.debug(`Using include list: ${includeList?.join(', ')}`)
     core.debug(`Using exclude list: ${excludeList.join(', ')}`)
+    core.debug(`Adding prefix: ${keyPrefix}`)
+    core.debug(`Removing prefix: ${removePrefix}`)
+    core.debug(`Override: ${override}`)
+    core.debug(`Convert: ${convert}`)
+    core.debug(`Override: ${override}`)
 
     for (const key of Object.keys(secrets)) {
       if (includeList && !includeList.some(inc => key.match(new RegExp(inc)))) {
@@ -54,7 +59,7 @@ or:
       }
 
       if (excludeList.some(inc => key.match(new RegExp(inc)))) {
-        if (traceLog) core.debug(`excluding ${key} as in includelist`)
+        if (traceLog) core.debug(`excluding ${key} as in excludelist`)
         continue
       }
 
@@ -85,7 +90,7 @@ or:
       }
 
       core.exportVariable(newKey, secrets[key])
-      core.info(`Exported secret ${newKey}`)
+      core.info(`Exported envvar -> ${newKey}`)
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
