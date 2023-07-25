@@ -7,7 +7,7 @@ export default async function run(): Promise<void> {
   ]
 
   try {
-    const secretsJson: string = core.getInput('secrets', { required: true })
+    const secretsJson: string = core.getInput('secrets', {required: true})
     const keyPrefix: string = core.getInput('prefix')
     const includeListStr: string = core.getInput('include')
     const excludeListStr: string = core.getInput('exclude')
@@ -74,7 +74,6 @@ or:
           newKey = newKey.toUpperCase()
         }
       }
-
 
       if (process.env[newKey]) {
         if (override) {
