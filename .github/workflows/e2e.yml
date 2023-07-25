@@ -14,14 +14,12 @@ jobs:
         uses: ./
         with:
           secrets: ${{ toJSON(vars) }}
-          exclude: non-existent,SECRET_2
+          exclude: non-existent,SECRET_2,PFX_+
           tracelog: 'true'
-        env:
-          SECRET_1: '1234' # Should show override warning
       - name: Verify secrets to env variables (with exclude)
         run: |
-          [[ "${SECRET_1}" != "1234" ]] && echo "Could not export SECRET_1 secret, value is ${SECRET_1}" && exit 1
           [[ "${SECRET_2}" != "" ]] && echo "SECRET_2 should be unset, got ${SECRET_2}" && exit 1
+          [[ "${PFX_VAR2}" != "" ]] && echo "PFX_VAR2 should be unset, got ${PFX_VAR2}" && exit 1
           [[ "${SECRET_3}" != "VALUE_3" ]] && echo "Could not export SECRET_3 secret, value is ${SECRET_3}" && exit 1
           true
         shell: bash
@@ -68,19 +66,19 @@ jobs:
           true
         shell: bash
 
-  test-override:
+  test-dont-override:
     runs-on: ubuntu-latest
     env:
       SECRET_1: DONT_OVERRIDE
     steps:
       - uses: actions/checkout@v3
-      - name: Export secrets to env variables (override)
+      - name: Export secrets to env variables (without override)
         uses: ./
         with:
-          override: true
           tracelog: 'true'
           secrets: ${{ toJSON(vars) }}
-      - name: Verify secrets to env variables (override)
+          include: SECRET_1
+      - name: Verify secrets to env variables (without override)
         run: |
           [[ "${SECRET_1}" != "DONT_OVERRIDE" ]] && echo "Override test failed" && exit 1
           true

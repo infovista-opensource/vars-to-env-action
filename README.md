@@ -94,7 +94,7 @@ steps:
 
 **Override:**
 
-Overrides already existing variables (default is true)
+Overrides already existing variables (default is **false**)
 
 ```yaml
 env:
@@ -151,3 +151,12 @@ Contributions are welcome! Past contributors:
 
 - José Luis Pereira @oNaiPs
 - Tamas Kadar @KTamas
+
+## Local development
+
+```shell
+# setup
+yarn install
+# before pushing the code to GH
+yarn run all 
+```
