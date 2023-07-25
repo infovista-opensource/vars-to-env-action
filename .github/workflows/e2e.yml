@@ -13,7 +13,7 @@ jobs:
       - name: Export secrets to env variables (with exclude)
         uses: ./
         with:
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ toJSON(vars) }}
           exclude: non-existent,SECRET_2
           tracelog: true
         env:
@@ -35,7 +35,7 @@ jobs:
         with:
           prefix: PREF_
           tracelog: true
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ toJSON(vars) }}
           include: non-existent, SECRET_1
       - name: Verify secrets to env variables (with prefix, include)
         run: |
@@ -79,7 +79,7 @@ jobs:
         with:
           override: true
           tracelog: true
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ toJSON(vars) }}
       - name: Verify secrets to env variables (override)
         run: |
           [[ "${SECRET_1}" != "DONT_OVERRIDE" ]] && echo "Override test failed" && exit 1
@@ -94,7 +94,7 @@ jobs:
         uses: ./
         with:
           convert: lower
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ toJSON(vars) }}
       - name: Verify secrets to env variables (convert)
         run: |
           [[ "${secret_1}" != "VALUE_1" ]] && echo "Could not export secret_1 secret, value is ${secret_1}" && exit 1
