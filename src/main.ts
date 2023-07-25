@@ -44,13 +44,15 @@ or:
       )
     }
 
-    core.debug(`Using include list: ${includeList?.join(', ')}`)
-    core.debug(`Using exclude list: ${excludeList.join(', ')}`)
-    core.debug(`Adding prefix: ${keyPrefix}`)
-    core.debug(`Removing prefix: ${removePrefix}`)
-    core.debug(`Override: ${override}`)
-    core.debug(`Convert: ${convert}`)
-    core.debug(`Override: ${override}`)
+    if (traceLog) {
+      core.debug(`Using include list: ${includeList?.join(', ')}`)
+      core.debug(`Using exclude list: ${excludeList.join(', ')}`)
+      core.debug(`Adding prefix: ${keyPrefix}`)
+      core.debug(`Removing prefix: ${removePrefix}`)
+      core.debug(`Override: ${override}`)
+      core.debug(`Convert: ${convert}`)
+      core.debug(`Override: ${override}`)
+    }
 
     for (const key of Object.keys(secrets)) {
       if (includeList && !includeList.some(inc => key.match(new RegExp(inc)))) {

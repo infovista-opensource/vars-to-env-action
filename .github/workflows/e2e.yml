@@ -15,7 +15,7 @@ jobs:
         with:
           secrets: ${{ toJSON(vars) }}
           exclude: non-existent,SECRET_2
-          tracelog: true
+          tracelog: 'true'
         env:
           SECRET_1: '1234' # Should show override warning
       - name: Verify secrets to env variables (with exclude)
@@ -34,7 +34,7 @@ jobs:
         uses: ./
         with:
           prefix: PREF_
-          tracelog: true
+          tracelog: 'true'
           secrets: ${{ toJSON(vars) }}
           include: non-existent, SECRET_1
       - name: Verify secrets to env variables (with prefix, include)
@@ -56,13 +56,13 @@ jobs:
         uses: ./
         with:
           removeprefix: PFX_
-          tracelog: true
+          tracelog: 'true'
           include: PFX_.+
           secrets: ${{ toJSON(vars) }}
       - name: Verify secrets to env variables (with prefix removal)
         run: |
-          [[ "${PFX_VAR1}" != "" ]] && echo "SECRET_1 should be unset, got ${SECRET_1}" && exit 1
-          [[ "${PFX_VAR2}" != "" ]] && echo "SECRET_2 should be unset, got ${SECRET_2}" && exit 1
+          [[ "${PFX_VAR1}" != "" ]] && echo "PFX_VAR1 should be unset, got ${PFX_VAR1}" && exit 1
+          [[ "${PFX_VAR2}" != "" ]] && echo "PFX_VAR2 should be unset, got ${PFX_VAR2}" && exit 1
           [[ "${VAR1}" != "var1" ]] && echo "Could not export VAR1 secret, value is ${PFX_VAR1}" && exit 1
           [[ "${VAR2}" != "var2" ]] && echo "Could not export VAR2 variable, value is ${PFX_VAR2}" && exit 1
           true
@@ -78,7 +78,7 @@ jobs:
         uses: ./
         with:
           override: true
-          tracelog: true
+          tracelog: 'true'
           secrets: ${{ toJSON(vars) }}
       - name: Verify secrets to env variables (override)
         run: |
@@ -93,6 +93,7 @@ jobs:
       - name: Export secrets to env variables (convert)
         uses: ./
         with:
+          tracelog: 'true'
           convert: lower
           secrets: ${{ toJSON(vars) }}
       - name: Verify secrets to env variables (convert)
