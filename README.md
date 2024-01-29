@@ -11,7 +11,11 @@ This action provides the following functionality for GitHub Actions users:
   - Include or exclude secrets (comma separated, supports regex)
   - Add/remove a prefix to all exported envvars
   - Override already existing variables (default is true)
-  
+
+## Node Version
+
+Use `@v1` for node16 and `@v2` for node20.
+
 ## Usage
 
 Add the following action to your workflow:
