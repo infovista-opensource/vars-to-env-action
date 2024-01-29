@@ -27,7 +27,7 @@ inputs:
     required: false
     description: 'extensive debug logging (false by default)'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: book-open
