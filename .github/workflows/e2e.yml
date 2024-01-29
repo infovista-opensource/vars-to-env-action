@@ -55,7 +55,7 @@ jobs:
         with:
           removeprefix: PFX_
           tracelog: 'true'
-          include: PFX_.+
+          #include: PFX_.+
           secrets: ${{ toJSON(vars) }}
       - name: Verify secrets to env variables (with prefix removal)
         run: |
@@ -63,6 +63,7 @@ jobs:
           [[ "${PFX_VAR2}" != "" ]] && echo "PFX_VAR2 should be unset, got ${PFX_VAR2}" && exit 1
           [[ "${VAR1}" != "var1" ]] && echo "Could not export VAR1 secret, value is ${PFX_VAR1}" && exit 1
           [[ "${VAR2}" != "var2" ]] && echo "Could not export VAR2 variable, value is ${PFX_VAR2}" && exit 1
+          [[ "${PREFIX_PFX_IN_VAR}" == "" ]] && echo "PREFIX_PFX_IN_VAR should be set, got empty" && exit 1
           true
         shell: bash
 
