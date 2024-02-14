@@ -100,10 +100,10 @@ or:
                     continue;
                 }
                 let newKey = key;
-                if (removePrefix.length) {
+                if (removePrefix.length && key.startsWith(removePrefix)) {
                     if (traceLog)
                         core.debug(`removing prefix from ${key}`);
-                    newKey = key.replace(removePrefix, '');
+                    newKey = key.slice(removePrefix.length);
                     if (traceLog)
                         core.debug(`prefix removal ${key} -> ${newKey}`);
                 }
@@ -706,7 +706,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {

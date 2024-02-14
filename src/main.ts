@@ -66,9 +66,9 @@ or:
       }
 
       let newKey = key
-      if (removePrefix.length) {
+      if (removePrefix.length && key.startsWith(removePrefix)) {
         if (traceLog) core.debug(`removing prefix from ${key}`)
-        newKey = key.replace(removePrefix, '')
+        newKey = key.slice(removePrefix.length)
         if (traceLog) core.debug(`prefix removal ${key} -> ${newKey}`)
       } else if (keyPrefix.length) {
         if (traceLog) core.debug(`adding prefix to ${key}`)
